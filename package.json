@@ -1,0 +1,15 @@
+{
+  "name": "electron",
+  "version": "1.0.0",
+  "description": "Some Electron tests",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron index.js"
+  },
+  "keywords": [],
+  "author": "Odar",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^3.0.2"
+  }
+}
