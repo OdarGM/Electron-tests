@@ -8,6 +8,10 @@ DiscordRPC.register("498930677484486656")
 const rpc = new DiscordRPC.Client({transport: "ipc"})
 const Menu = electon.Menu
 const MenuItem = electon.MenuItem
+const globalShortcut = electon.globalShortcut
+const Tray = electon.Tray
+const TrayIcon = path.join(__dirname, "Images/odar.png")
+let tray = null
 
 let mainWindow;
 
@@ -43,113 +47,162 @@ ipc.on("async-ipc-error", function(event) {
 
 })
 
-app.on("ready", () => {
 
-    //createWindow()
+app.on("ready", function(){
 
-    const template = [
-      {
-        label: "Menu",
-        submenu: [
-          {
-            label: "Edit",
+    //TRAY MENU
+
+    tray = new Tray(TrayIcon)
+
+    const TrayTemplate = [
+        {
+            label: "Links",
             submenu: [
                 {
-                    role: "undo",
+                    label: "Site",
+                    click: function(){
+                        electon.shell.openExternal("https://odar.xyz")
+                    }
                 },
                 {
-                    role: "redo"
-                },
-                {
-                    type: "separator"
-                },
-                {
-                    role: "cut"
-                },
-                {
-                    role: "copy"
-                },
-                {
-                    role: "paste"
-                },
-                {
-                    role: "pasteandmatchstyle"
-                },
-                {
-                    role: "delete"
-                },
-                {
-                    role: "selectall"
+                    label: "Discord",
+                    click: function(){
+                        electon.shell.openExternal("https://odar.xyz/invite")
+                    }
                 }
             ]
-          },
-          {
-            label: "Test",
-             click: function () {
-               console.log("Clicked Test button")
-             }
-          },
-          {
-            label: 'Donate'
-          },
-          {
-            type: "separator"
-          },
-          {
-            label: "Scam"
-          }
-        ]
-      },
-      {
-          label: "Site",
-          click: function(){
-              electon.shell.openExternal("https://odar.xyz")
-          }
-      }
+        },
+        {
+            label: "Support"
+        }
     ]
 
-  const menu =  Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
+    const ctxTrayMenu = Menu.buildFromTemplate(TrayTemplate)
 
-  const ctxMenu = new Menu()
-  ctxMenu.append(new MenuItem({
-      label: "Click me",
-      click: function() {
-          console.log("Button cliked?")
-      }
-  }))
+    tray.setContextMenu(ctxTrayMenu)
+    tray.setToolTip("Odar Electron App")
 
-  ctxMenu.append(new MenuItem({
-      role: "selectall"
-  }))
-
-    mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        maxHeight: 1000,
-        maxWidth: 800,
-        backgroundColor: "#23272A",
-        /*frame: false */
-    })
-    mainWindow.loadURL(path.join(`file://`, __dirname, "index.html"))
-    //mainWindow.loadURL("https://odar.xyz")
-
-    //mainWindow.webContents.openDevTools()
-
-    mainWindow.webContents.on("context-menu", function(e, params) {
-        ctxMenu.popup(mainWindow, params.x, params.y)
-    })
-
-
-    mainWindow.on("ready-to-show", () => {
-        mainWindow.show()
-    })
-
-    mainWindow.on("closed", () => {
-        mainWindow = null
-    })
+    //END TRAY MENU
+    
+    const template = [
+        {
+          label: "Menu",
+          submenu: [
+            {
+              label: "Edit",
+              submenu: [
+                  {
+                      role: "undo",
+                  },
+                  {
+                      role: "redo"
+                  },
+                  {
+                      type: "separator"
+                  },
+                  {
+                      role: "cut"
+                  },
+                  {
+                      role: "copy"
+                  },
+                  {
+                      role: "paste"
+                  },
+                  {
+                      role: "pasteandmatchstyle"
+                  },
+                  {
+                      role: "delete"
+                  },
+                  {
+                      role: "selectall"
+                  }
+              ]
+            },
+            {
+              label: "Test",
+               click: function () {
+                 console.log("Clicked Test button")
+               }
+            },
+            {
+              label: "Help",
+              click: function(){
+                  electon.shell.openExternal("https://odar.xyz")
+              },
+              accelerator: "CmdorCtrl + H",
+            },
+            {
+              label: 'Donate'
+            },
+            {
+              type: "separator"
+            },
+            {
+              label: "Scam"
+            }
+          ]
+        },
+        {
+            label: "Site",
+            click: function(){
+                electon.shell.openExternal("https://odar.xyz")
+            }
+        }
+      ]
+  
+    const menu =  Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+  
+    const ctxMenu = new Menu()
+    ctxMenu.append(new MenuItem({
+        label: "Click me",
+        click: function() {
+            console.log("Button cliked?")
+        }
+    }))
+  
+    ctxMenu.append(new MenuItem({
+        role: "selectall"
+    }))
+  
+      mainWindow = new BrowserWindow({
+          width: 800,
+          height: 600,
+          maxHeight: 1000,
+          maxWidth: 800,
+          backgroundColor: "#23272A",
+      })
+      mainWindow.loadURL(path.join(`file://`, __dirname, "index.html"))
+      //mainWindow.loadURL("https://odar.xyz")
+  
+  
+      mainWindow.webContents.on("context-menu", function(e, params) {
+          ctxMenu.popup(mainWindow, params.x, params.y)
+      })
+  
+      mainWindow.on("ready-to-show", () => {
+          mainWindow.show()
+      })
+  
+      mainWindow.on("closed", () => {
+          mainWindow = null
+      })
+  
+      globalShortcut.register("Alt + 1", function(){
+  
+          mainWindow.show()
+  
+      })
 
 });
+
+app.on("will-quit", function(){
+
+    globalShortcut.unregisterAll()
+
+})
 
 app.on("window-all-closed", () => {
     if(process.platform !== "darwin"){
@@ -173,4 +226,4 @@ app.on("activate", () => {
         })
 
     }
-})
+}) 

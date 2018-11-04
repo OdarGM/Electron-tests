@@ -1,9 +1,17 @@
 const electron = require("electron")
 const ipc = electron.ipcRenderer
+const shell = require("electron").shell
 
 const errorBtn = document.getElementById("errorBtn")
 const AsyncBtn = document.getElementById("AsyncBtn")
 const syncBtn = document.getElementById("syncBtn")
+const openBtn = document.getElementById("openBtn")
+
+open.addEventListener("click", function(event){
+
+    shell.showItemInFolder("C:\\Downloads")
+
+})
 
 errorBtn.addEventListener("click", function() {
 
